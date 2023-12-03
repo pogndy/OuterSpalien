@@ -1,4 +1,4 @@
-package PlatformerExample_ninjaGirl;
+package outerSpaliens;
 
 public class Vector2D 
 {
