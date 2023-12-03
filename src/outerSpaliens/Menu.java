@@ -1,4 +1,4 @@
-package PlatformerExample_ninjaGirl;
+package outerSpaliens;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -38,7 +38,7 @@ class myPanel extends JPanel
             side.add(new JLabel("Outer Spalien"));
                 
             //Yay, buttons
-            JButton startButton = new JButton("Start");
+            JButton startButton = new JButton("Play");
             //what happens when you click the button?
             startButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) 
@@ -49,15 +49,6 @@ class myPanel extends JPanel
             //Everything has a setSize, setPreferredSize, setMaximumSize and setMinimumSize. Which one that is used depends on the layout that is set
             startButton.setMaximumSize(new Dimension(100,40));
             side.add(startButton);
-            
-            JButton tutorialButton = new JButton("Tutorial");
-            tutorialButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) 
-                {
-                    System.out.println("Go to Tutorial game stuff");					
-            }});
-            tutorialButton.setMaximumSize(new Dimension(100,40));
-            side.add(tutorialButton);
             
             JButton creditButton = new JButton("Credits");
             creditButton.addActionListener(new ActionListener() {

@@ -1,4 +1,4 @@
-package PlatformerExample_ninjaGirl;
+package outerSpaliens;
  
 
 import java.awt.Color;
@@ -29,11 +29,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.JPanel;
 
-import PlatformerExample_ninjaGirl.myPanel;
+
 
 public class ClassDemoForPlatformerLab extends JFrame
 {
-	public final static String PATH = ".\\src\\PlatformerExample_ninjaGirl\\";
+	public final static String PATH = ".\\src\\outerSpaliens\\";
 	public static void main(String[] args) {
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,6 +59,8 @@ public class ClassDemoForPlatformerLab extends JFrame
 	public static int CameraX=0, CameraY = 0;
 	
 	ArrayList<Block> blocks = new ArrayList<Block>();
+	ArrayList<Block> killblocks = new ArrayList<Block>();
+
 	
 	GameState state = GameState.RUNNING;
 	
@@ -120,6 +122,18 @@ public class ClassDemoForPlatformerLab extends JFrame
 									Integer.parseInt(tokens[7]))
 							));
 				}
+				else if (line.startsWith("KillBlock"))
+				{
+					String tokens[] = line.split(",");
+					killblocks.add(new Block(Integer.parseInt(tokens[1]),
+							Integer.parseInt(tokens[2]),
+							Integer.parseInt(tokens[3]),
+							Integer.parseInt(tokens[4]),
+							new Color(Integer.parseInt(tokens[5]),
+									Integer.parseInt(tokens[6]),
+									Integer.parseInt(tokens[7]))
+							));
+				}
 			}
 		
 			
@@ -156,14 +170,27 @@ public class ClassDemoForPlatformerLab extends JFrame
 			//level
 				for (Block b : blocks)
 				{
+					//System.out.println(b.C);
 					b.draw(rasterGraphics);
 				}
+				for (Block kb : killblocks)
+				{
+					//System.out.println(kb.getLocation());
+					kb.draw(rasterGraphics);
+					kb.Move();
+				}
+
+				
 				
 			//player and other actors(enemies)
 				p.Move();
 				p.DrawBall(rasterGraphics);
 				for (Block b : blocks)
 					p.checkCollision(b);
+				for (Block kb : killblocks)
+				{
+					p.checkkillCollision(kb);
+				}
 				
 			//update carmera
 //				int current = (int)p.Location.getX();
@@ -229,6 +256,7 @@ public class ClassDemoForPlatformerLab extends JFrame
 interface Collidable
 {
 	public Rectangle getCollision();
+	public Rectangle getKillCollision();
 }
 abstract class ScreenObj implements Serializable
 {
@@ -247,8 +275,15 @@ class Block extends ScreenObj implements Collidable, Serializable
 	}
 	public Rectangle getCollision()
 	{
+		//System.out.println( new Rectangle((int)Location.getX(), (int)Location.getY(), (int)Size.getX(), (int)Size.getY()));
 		return new Rectangle((int)Location.getX(), (int)Location.getY(), (int)Size.getX(), (int)Size.getY());
 	}
+	public Rectangle getKillCollision()
+	{
+		//System.out.println( new Rectangle((int)Location.getX(), (int)Location.getY(), (int)Size.getX(), (int)Size.getY()));
+		return new Rectangle((int)Location.getX(), (int)Location.getY(), (int)Size.getX(), (int)Size.getY());
+	}
+
 	public void draw(Graphics g)
 	{
 		g.setColor(C);
@@ -259,7 +294,73 @@ class Block extends ScreenObj implements Collidable, Serializable
 		g.setColor(Color.WHITE);
 		g.drawRect((int)Location.getX() - ClassDemoForPlatformerLab.CameraX, (int)Location.getY()- ClassDemoForPlatformerLab.CameraY, (int)Size.getX(), (int)Size.getY());
 	}
+	private int speed = 1;
+
+	private Vector2D Velocity = new Vector2D(1,0);
+
+	private Vector2D Location;
+
+	public Vector2D getLocation()
+	{
+		return new Vector2D(Location);//composition
+	}
+
+	public void setLocation(Vector2D location)
+	{
+		Location = new Vector2D(location); //composition
+	}
+	
+	public void Move()
+	{
+		int last = 50;
+		int first = 200;
+		int speed = this.speed;
+		//System.out.println(getLocation());
+		setLocation(getLocation().add(Velocity.multiply(.4f)));
+		
+		if (getLocation().getX() < 50 && speed != 1)
+		{
+			System.out.println("below 50");
+			this.speed = 1;
+			Velocity = new Vector2D(1,0);
+		}
+		if (getLocation().getX() > 150 && speed != -1)
+		{
+
+			this.speed = -1;
+			System.out.println("Above 150");
+
+			Velocity = new Vector2D(-1,0);
+		}
+
+
+		
+//		
+//		while(true)
+//		{
+//		if(getLocation().getX() > 200)
+//			Veol
+//		}
+	}
+	
+
 }
+class Entity extends ScreenObj implements Collidable, Serializable
+{
+
+	public Rectangle getCollision() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Rectangle getKillCollision() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'getKillCollision'");
+	}
+	
+}
+
 class PlatPlayer implements KeyListener,  Serializable
 {
 	//if other things need sprite then it should be a regular class instead of an inner class. It could be an inner class of a "SpriteObject" base class though.
@@ -302,7 +403,7 @@ class PlatPlayer implements KeyListener,  Serializable
 	
 	private boolean UP, DOWN, RIGHT, LEFT, GROUND, SPACE;
 	
-	private PlatPlayer.Sprite sprite = new PlatPlayer.Sprite(ClassDemoForPlatformerLab.PATH+"NinjaGirl");
+	private PlatPlayer.Sprite sprite = new PlatPlayer.Sprite(ClassDemoForPlatformerLab.PATH+"alienspritesheet");
 	
 	enum facing
 	{
@@ -422,7 +523,7 @@ class PlatPlayer implements KeyListener,  Serializable
 	 */
 	public void Die() 
 	{
-		setLocation(new Vector2D(100,100));
+		setLocation(new Vector2D(100,-100));
 		Velocity = new Vector2D(0,0);
 	}
 	public void checkCollision(Collidable c)
@@ -444,6 +545,7 @@ class PlatPlayer implements KeyListener,  Serializable
 		
 		if (myCollision.intersects(c.getCollision()))
 		{
+			//System.out.println(myCollision.intersects(c.getCollision()));
 			//I hit something but where?
 			Ellipse2D.Float bottomCollision = new Ellipse2D.Float((int)getLocation().getX()-startXCollision,(int)getLocation().getY()+OffsetStartCollisionY, XCollisionWidth,collisionSize);
 			if (Velocity.getY() > 0 && bottomCollision.intersects(c.getCollision()))
@@ -461,10 +563,52 @@ class PlatPlayer implements KeyListener,  Serializable
 			Ellipse2D.Float leftCollision = new Ellipse2D.Float((int)getLocation().getX()-startXLeftCollision,(int)getLocation().getY()-startYCollision, collisionSize,YCollisionWidth);
 			if (Velocity.getX() < 0 && leftCollision.intersects(c.getCollision()))
 			{
-				//then i'm running into something on the left			
+				//then i'm running into something on the left
+				System.out.println(c.getCollision());
 					Velocity.setX(0);
 			}
+
 		}
+	}
+		public void checkkillCollision(Collidable c)
+		{
+			//TODO: ADD a MTD (minimum translation distance)
+			Ellipse2D.Float myCollision = new Ellipse2D.Float(getLocation().getX()-Size.getX()/2,getLocation().getY()-Size.getY()/2, Size.getX(),Size.getY());
+			
+			float collisionSize = Size.getX()/8;
+			float startXCollision = Size.getX()/4; //10
+			float endXCollision = Size.getX()*3/4; //30
+			float XCollisionWidth = endXCollision - startXCollision;
+			float OffsetStartCollisionX = Size.getX()*3/8; //15
+			float OffsetStartCollisionY = Size.getY()*3/8; //15
+			
+			float startXLeftCollision =  Size.getX()/2;
+			float startYCollision = Size.getY()/4;
+			float endYCollision = Size.getY()*3/4; //30
+			float YCollisionWidth = endYCollision - startYCollision;
+			
+			if (myCollision.intersects(c.getCollision()))
+			{
+				//System.out.println(myCollision.intersects(c.getCollision()));
+				//I hit something but where?
+				Ellipse2D.Float bottomCollision = new Ellipse2D.Float((int)getLocation().getX()-startXCollision,(int)getLocation().getY()+OffsetStartCollisionY, XCollisionWidth,collisionSize);
+				if (Velocity.getY() > 0 && bottomCollision.intersects(c.getCollision()))
+				{
+					Die();
+				}
+				Ellipse2D.Float rightCollision = new Ellipse2D.Float((int)getLocation().getX()+OffsetStartCollisionX,(int)getLocation().getY()-startYCollision, collisionSize,YCollisionWidth);
+				if (Velocity.getX() > 0 && rightCollision.intersects(c.getCollision()))
+				{
+					//then i'm running into something on the right				
+				Die();	
+				}
+				Ellipse2D.Float leftCollision = new Ellipse2D.Float((int)getLocation().getX()-startXLeftCollision,(int)getLocation().getY()-startYCollision, collisionSize,YCollisionWidth);
+				if (Velocity.getX() < 0 && leftCollision.intersects(c.getCollision()))
+				{
+					Die();
+				}
+			}
+
 	}
 	public void DrawBall(Graphics g)
 	{
