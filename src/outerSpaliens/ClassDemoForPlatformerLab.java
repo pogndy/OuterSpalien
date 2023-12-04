@@ -27,6 +27,9 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
+
+import outerSpaliens.ClassDemoForPlatformerLab.GameState;
+
 import javax.swing.JPanel;
 
 
@@ -38,6 +41,7 @@ public class ClassDemoForPlatformerLab extends JFrame
 		ClassDemoForPlatformerLab f = new ClassDemoForPlatformerLab();
         JFrame frame = new JFrame();
 		f.setVisible(true);
+		f.setVisible(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(new myPanel(f)); // Pass the game instance to the panel
         frame.setSize(800, 800);
@@ -65,6 +69,7 @@ public class ClassDemoForPlatformerLab extends JFrame
 	GameState state = GameState.MENU;
 	
 	public void startGame() {
+		this.setVisible(true);
         state = GameState.RUNNING;
     }
 	
@@ -552,14 +557,16 @@ class PlatPlayer implements KeyListener,  Serializable
 	// remove lives and reset to a starting or saved position
 	public void Die() 
 	{
-		if (lives > 0) {
+		if (lives > 0) { //checks if lives is above 0
             lives--;
 		}
+	
 		setLocation(new Vector2D(100,-100));
 		Velocity = new Vector2D(0,0);
         
         
 	}
+	//getters and setters for Lives
 	public int getLives() {
         return lives;
     }
