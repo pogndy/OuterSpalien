@@ -35,17 +35,17 @@ public class ClassDemoForPlatformerLab extends JFrame
 {
 	public final static String PATH = ".\\src\\outerSpaliens\\";
 	public static void main(String[] args) {
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(new myPanel());
-		frame.setSize(800,800);
-		frame.setVisible(true);
 		ClassDemoForPlatformerLab f = new ClassDemoForPlatformerLab();
-		f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		f.setSize(800,800);		
-		f.setVisible(true);	
-		f.setup();
-		f.draw();
+        JFrame frame = new JFrame();
+		f.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(new myPanel(f)); // Pass the game instance to the panel
+        frame.setSize(800, 800);
+        frame.setVisible(true);
+        f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        f.setSize(800, 800);    
+        f.setup();
+        f.draw();
 	}
 	
 	//buffer for drawing off screen
@@ -62,7 +62,11 @@ public class ClassDemoForPlatformerLab extends JFrame
 	ArrayList<Block> killblocks = new ArrayList<Block>();
 
 	
-	GameState state = GameState.RUNNING;
+	GameState state = GameState.MENU;
+	
+	public void startGame() {
+        state = GameState.RUNNING;
+    }
 	
 	boolean CLICK = false;
 	
@@ -144,6 +148,7 @@ public class ClassDemoForPlatformerLab extends JFrame
 	{
 		RUNNING,
 		PAUSED,
+		MENU,
 	}
 	
 	/**
@@ -161,8 +166,7 @@ public class ClassDemoForPlatformerLab extends JFrame
 		{
 			//get the start time of the loop to use later
 				long time = System.currentTimeMillis();
-			
-			if (state == GameState.RUNNING)
+			if (state == GameState.RUNNING && p.getLives() > 0)
 			{	
 			//draw and move the background and balls
 				DrawBackground(rasterGraphics);
@@ -180,7 +184,7 @@ public class ClassDemoForPlatformerLab extends JFrame
 					kb.Move();
 				}
 
-				
+				drawHUD(rasterGraphics, p.getLives());
 				
 			//player and other actors(enemies)
 				p.Move();
@@ -233,6 +237,27 @@ public class ClassDemoForPlatformerLab extends JFrame
 					CLICK = false;
 				}				
 			}
+			else if (p.getLives() == 0) {
+				Rectangle YouDied = new Rectangle(200,265,400,100);
+				Rectangle Restart = new Rectangle(250,400,300,100);
+
+				rasterGraphics.setColor(Color.RED);
+				((Graphics2D) rasterGraphics).fill(YouDied);
+				rasterGraphics.setColor(Color.WHITE);
+				rasterGraphics.setFont(new Font("Arial",Font.PLAIN,50));
+				rasterGraphics.drawString("ALIEN DOWN!",240,325);
+
+				rasterGraphics.setColor(Color.RED);
+				((Graphics2D) rasterGraphics).fill(Restart);
+				rasterGraphics.setColor(Color.WHITE);
+				rasterGraphics.drawString("Restart?",305,460);
+				if (CLICK)
+				{
+					if (Restart.contains(MouseInfo.getPointerInfo().getLocation()))
+						p.addLives(3);
+					CLICK = false;
+				}		
+			}
 			
 			
 			//draw the scene from the buffered raster (all at once to avoid flickering)
@@ -251,8 +276,14 @@ public class ClassDemoForPlatformerLab extends JFrame
 	{
 		g.setColor(new Color(170,180,240));
 		g.fillRect(0, 0, 800, 800);
-	}	
+	}
+	private void drawHUD(Graphics g, int lives) {
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 30));
+        g.drawString("Lives: " + lives, 10, 780); // Position it at the bottom left
+    }	
 }
+
 interface Collidable
 {
 	public Rectangle getCollision();
@@ -390,7 +421,7 @@ class PlatPlayer implements KeyListener,  Serializable
 			currentFrame = spriteSheet.getSubimage(frameNumber*tileXSize, animationNumber*tileYSize, tileXSize, tileYSize);
 		}	
 	}
-	
+	private int lives = 3;
 	private Color C;
 	//These variables are how much we are going to change the current X and Y per loop
 	private float speed;
@@ -518,14 +549,24 @@ class PlatPlayer implements KeyListener,  Serializable
 			if (getLocation().getY() > 5000) //Then you dead yo
 				Die();				
 	}
-	/**
-	 * remove lives and reset to a starting or saved position
-	 */
+	// remove lives and reset to a starting or saved position
 	public void Die() 
 	{
+		if (lives > 0) {
+            lives--;
+		}
 		setLocation(new Vector2D(100,-100));
 		Velocity = new Vector2D(0,0);
+        
+        
 	}
+	public int getLives() {
+        return lives;
+    }
+	public void addLives(int lives) {
+		this.lives += lives;
+	}
+
 	public void checkCollision(Collidable c)
 	{
 		//TODO: ADD a MTD (minimum translation distance)
@@ -661,4 +702,5 @@ class PlatPlayer implements KeyListener,  Serializable
 	    	if (e.getKeyCode() == KeyEvent.VK_SPACE)
 	    		SPACE=false;
 	    }
+
 }
