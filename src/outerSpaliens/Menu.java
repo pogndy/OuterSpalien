@@ -3,6 +3,7 @@ package outerSpaliens;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -17,6 +18,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -48,7 +50,7 @@ class myPanel extends JPanel
                     //tell the game to go to start somehow (set an enum, or boolean or string, DO NOT Directly call the game to start in a method here)
                     System.out.println("Go to start game stuff");	
                     startGame();
-                    SwingUtilities.getWindowAncestor(startButton).dispose();				
+                    SwingUtilities.getWindowAncestor(startButton).dispose(); //removes main menu				
             }});
             //Everything has a setSize, setPreferredSize, setMaximumSize and setMinimumSize. Which one that is used depends on the layout that is set
             startButton.setMaximumSize(new Dimension(100,40));
@@ -58,7 +60,8 @@ class myPanel extends JPanel
             creditButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) 
                 {
-                    System.out.println("Go to credits stuff");					
+                createCreditsWindow();
+                   				
             }});
             creditButton.setMaximumSize(new Dimension(100,40));
             side.add(creditButton);
@@ -84,13 +87,14 @@ class myPanel extends JPanel
         this.add(center);
         
     }
+    //method used to buffer the centerpiece image
     private static BufferedImage loadImage(String fileName) {
         try {
             File file = new File(fileName);
             if (file.exists()) {
                 return ImageIO.read(file);
             } else {
-                System.out.println("Could not find " + fileName);
+                System.out.println("Could not find " + fileName); //debug testing
                 return null;
             }
         } 
@@ -102,6 +106,27 @@ class myPanel extends JPanel
     public void startGame() {
         game.startGame();
         
+    }
+    private void createCreditsWindow() {
+        JFrame creditsFrame = new JFrame("Credits");
+        creditsFrame.setSize(400, 400);
+        creditsFrame.setLayout(new BorderLayout());
+
+        JLabel creditsLabel = new JLabel("<html>A Big Thank You to These People!!<br><br>Shawn Anderson<br>Ayden Jansen<br>Andres Balderas</html>");
+        creditsLabel.setFont(new Font("Arial", Font.PLAIN, 30));
+        creditsFrame.add(creditsLabel, BorderLayout.CENTER);
+
+        JButton backButton = new JButton("Back to Main Menu");
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                creditsFrame.dispose(); // Close the credits window
+                
+            }
+        });
+
+        creditsFrame.add(backButton, BorderLayout.SOUTH);
+        creditsFrame.setLocationRelativeTo(null); // Center the window
+        creditsFrame.setVisible(true);
     }
 
 
