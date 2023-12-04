@@ -19,15 +19,17 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 class myPanel extends JPanel
 {
+    ClassDemoForPlatformerLab game;
     String fileName = "outerspalienmenu.png";
     BufferedImage image = loadImage(fileName);
-    public myPanel()
+    public myPanel(ClassDemoForPlatformerLab game)
     {
         this.setLayout(new BorderLayout(20,20));
-            
+        this.game = game;
         JPanel side = new JPanel();
         //how to arrange our components on our panel
             //see https://docs.oracle.com/javase/tutorial/uiswing/layout/visual.html for more info
@@ -44,7 +46,9 @@ class myPanel extends JPanel
                 public void actionPerformed(ActionEvent e) 
                 {
                     //tell the game to go to start somehow (set an enum, or boolean or string, DO NOT Directly call the game to start in a method here)
-                    System.out.println("Go to start game stuff");					
+                    System.out.println("Go to start game stuff");	
+                    startGame();
+                    SwingUtilities.getWindowAncestor(startButton).dispose();				
             }});
             //Everything has a setSize, setPreferredSize, setMaximumSize and setMinimumSize. Which one that is used depends on the layout that is set
             startButton.setMaximumSize(new Dimension(100,40));
@@ -95,6 +99,12 @@ class myPanel extends JPanel
             return null;
         }
     }
+    public void startGame() {
+        game.startGame();
+        
+    }
+
 
 }
+
 
