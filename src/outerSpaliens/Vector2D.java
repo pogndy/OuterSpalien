@@ -1,6 +1,8 @@
 package outerSpaliens;
 
-public class Vector2D 
+import java.io.Serializable;
+
+public class Vector2D implements Serializable
 {
     private float x;
     private float y;
