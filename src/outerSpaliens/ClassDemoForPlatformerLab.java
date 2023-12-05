@@ -230,7 +230,7 @@ public class ClassDemoForPlatformerLab extends JFrame
 					kb.Move();
 				}
 
-				drawHUD(rasterGraphics, p.getLives());
+				drawHUD(rasterGraphics, p.getLives(), currentLevel);
 				
 				entity.draw(rasterGraphics);
                 
@@ -369,11 +369,12 @@ public class ClassDemoForPlatformerLab extends JFrame
         g.drawImage(background, backgroundX, backgroundY, this);
         g.drawImage(spaceship, spaceshipX, spaceshipY, this);
 	}
-	private void drawHUD(Graphics g, int lives) {
+	private void drawHUD(Graphics g, int lives, int currentLevel) {
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 30));
         g.drawString("Lives: " + lives, 10, 780); // Position it at the bottom left
-    }	
+		g.drawString("Level: " + currentLevel,670, 780);
+	}	
 }
 
 interface Collidable
