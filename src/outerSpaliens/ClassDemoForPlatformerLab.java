@@ -357,6 +357,7 @@ public static PlatPlayer readInfo() throws IOException, ClassNotFoundException {
                         // Assuming 'player' is your current PlatPlayer instance
                         // Assuming 'player' is your current PlatPlayer instance
                         try {
+                            resetGame();
                             PlatPlayer loadedPlayer = readInfo();
                             p.setLives(loadedPlayer.getLives()); // Update the lives of the current player
                             p.setLocation(loadedPlayer.getLocation());
